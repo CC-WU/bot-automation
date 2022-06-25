@@ -1,0 +1,49 @@
+name: 蝦皮每日簽到
+
+on:
+  workflow_dispatch: ~
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Run cron at 00:10 UTC+8
+    - cron:  '10 16 * * *'
+
+jobs:
+  checkin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check inputs
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        env:
+          SHOPEE_USERNAME: ${{ secrets.SHOPEE_USERNAME }}
+          SHOPEE_PASSWORD: ${{ secrets.SHOPEE_PASSWORD }}
+          AES_KEY: ${{ secrets.AES_KEY }}
+        run: |
+          exit_code=0
+          if [[ -z "$SHOPEE_USERNAME" ]]; then
+            echo '::error::你沒有設定帳號，請檢查設定或參考使用說明。帳號的 Name 欄位必須是 "SHOPEE_USERNAME"（不含引號），請再確認一次。'
+            exit_code=87
+          fi
+          if [[ -z "$SHOPEE_PASSWORD" ]]; then
+            echo '::error::你沒有設定密碼，請檢查設定或參考使用說明。密碼的 Name 欄位必須是 "SHOPEE_PASSWORD"（不含引號），請再確認一次。'
+            exit_code=87
+          fi
+          if [[ -z "$AES_KEY" ]]; then
+            echo '::error::你沒有設定金鑰，請檢查設定或參考使用說明。金鑰的 Name 欄位必須是 "AES_KEY"（不含引號），請再確認一次。'
+            exit_code=87
+          elif [[ ! "$AES_KEY" =~ ^[0-9a-fA-F]{64}$ ]]; then
+            echo '::error::金鑰不符合格式，必須是 64 個 0-9 或 a-f 的英數字組合。'
+            exit_code=87
+          fi
+
+          if [[ $exit_code -eq 87 ]]; then
+            echo '::error::請參考說明文件：https://github.com/wdzeng/bot-automation/blob/main/docs/shopee-gha-inst.md。'
+          fi
+          exit $exit_code
+
+      - name: Run checkin bot 
+        uses: wdzeng/shopee-coins-bot@main
+        with:
+          key: ${{ secrets.AES_KEY }}
+          username: ${{ secrets.SHOPEE_USERNAME }}
+          password: ${{ secrets.SHOPEE_PASSWORD }}
+          login: ${{ (github.event_name == 'schedule') && 'credential' || 'password' }}
