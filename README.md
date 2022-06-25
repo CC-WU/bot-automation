@@ -33,10 +33,6 @@
 
 如果你發現按鈕沒有出現在畫面上，表示已經是最新版。
 
-## 聯繫開發者
+## Reference
 
-**除非你有涉及隱私的訊息要傳達**，否則請一律到 [issue](https://github.com/wdzeng/bot-automation/issues?q=) 區發問，不要寄電子郵件。所謂的涉及隱私，是指訊息內容涉及個資或帳號密碼。
-
-- me@hyperbola.me
-
-聯繫開發者時，如果情況必要請主動提及你的 GitHub ID，讓開發者協助你！
+wdzeng(https://github.com/wdzeng/bot-automation)
